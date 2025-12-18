@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dragon Dash</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; background:#000; overflow:hidden; }
+    #game-container { width:100%; height:100%; }
+  </style>
+  <script>
+    (function(){
+      // Ambient profile API
+      if(!window.Ambient){ window.Ambient = {}; }
+      const profiles = {
+        ui  : { x:[0.10,0.90], split:0.50 },
+        play: { x:[0.10,0.90], split:0.50 }
+      };
+      let activeProfile = profiles.ui;
+      window.Ambient.setProfile = function(mode){
+        const p = profiles[mode] || profiles.ui;
+        activeProfile = p;
+        // force immediate repaint next tick
+        lastTop = {r:0,g:0,b:0};
+        lastBot = {r:0,g:0,b:0};
+        pendingImmediate = 2; // apply without delay for next 2 frames
+      };
+      window.Ambient.debug = false;
+      window.Ambient.setConfig = function(cfg){
+        if(!cfg) return; activeProfile = { ...activeProfile, ...cfg };
+        lastTop = {r:0,g:0,b:0}; lastBot = {r:0,g:0,b:0}; pendingImmediate = 2;
+      };
+      function lerp(a,b,t){return a+(b-a)*t}
+      function toCss(c){return `rgb(${c.r|0},${c.g|0},${c.b|0})`}
+      function luminance(c){ return 0.2126*c.r + 0.7152*c.g + 0.0722*c.b }
+      function rgb2hsl(r,g,b){ r/=255; g/=255; b/=255; const max=Math.max(r,g,b), min=Math.min(r,g,b); let h=0,s,l=(max+min)/2; if(max!==min){ const d=max-min; s=l>0.5? d/(2-max-min): d/(max+min); switch(max){case r: h=(g-b)/d+(g<b?6:0); break; case g: h=(b-r)/d+2; break; case b: h=(r-g)/d+4; break;} h/=6;} return {h,s,l}; }
+      function hsl2rgb(h,s,l){ let r,g,b; if(s===0){ r=g=b=l; } else { const hue2rgb=(p,q,t)=>{ if(t<0) t+=1; if(t>1) t-=1; if(t<1/6) return p+(q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p+(q-p)*(2/3-t)*6; return p; }; const q=l<0.5? l*(1+s): l+s-l*s; const p=2*l-q; r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);} return {r:Math.round(r*255), g:Math.round(g*255), b:Math.round(b*255)} }
+      function saturateColor(c){
+        const hsl=rgb2hsl(c.r,c.g,c.b);
+        const S=Math.max(0.6, Math.min(0.9, hsl.s*1.6));
+        const L=Math.max(0.32, Math.min(0.68, hsl.l));
+        const rgb=hsl2rgb(hsl.h,S,L);
+        return rgb;
+      }
+      function dominantBandColor(ctx, sx, sy, cw, ch, sample, def){
+        let data=null; try { data=ctx.getImageData(sx,sy,cw,ch).data; } catch(e){ data=null; }
+        if(!data) return def || null;
+        // RGB 4-bit per channel histogram (4096 bins). To save memory, use Map.
+        const bins = new Map();
+        let maxKey = null; let maxScore = 0;
+        for(let p=0;p<data.length;p+=4*sample){
+          const a = data[p+3]; if(a<8) continue;
+          const R=data[p],G=data[p+1],B=data[p+2];
+          const r4=R>>4, g4=G>>4, b4=B>>4; const key=(r4<<8)|(g4<<4)|b4;
+          const s = (Math.max(R,G,B)-Math.min(R,G,B))/255; // saturation 0..1
+          const w = 1 + s; // weight saturated colors more
+          const prev = bins.get(key);
+          if(prev){ prev.count+=w; prev.r+=R; prev.g+=G; prev.b+=B; }
+          else bins.set(key,{count:w,r:R,g:G,b:B});
+        }
+        bins.forEach((v,k)=>{ if(v.count>maxScore){ maxScore=v.count; maxKey=k; }});
+        if(!maxKey) return def || null;
+        const v=bins.get(maxKey); return {r:v.r/v.count, g:v.g/v.count, b:v.b/v.count};
+      }
+      function findOpaqueRowTop(ctx,w,h){
+        // scan from top to bottom for first row having any alpha > 8
+        try{
+          for(let y=0; y<h; y++){
+            const row = ctx.getImageData(0,y,w,1).data; for(let x=0;x<w;x++){ if(row[x*4+3] > 8) return y; }
+          }
+        }catch(e){}
+        return Math.floor(h*0.25);
+      }
+      function findOpaqueRowBottom(ctx,w,h){
+        // scan from bottom to top for first row having any alpha > 8
+        try{
+          for(let y=h-1; y>=0; y--){
+            const row = ctx.getImageData(0,y,w,1).data; for(let x=0;x<w;x++){ if(row[x*4+3] > 8) return y; }
+          }
+        }catch(e){}
+        return Math.floor(h*0.75);
+      }
+      function stripeAtYColor(ctx,w,h,y,def){
+        const x0 = Math.floor(w*activeProfile.x[0]);
+        const x1 = Math.floor(w*activeProfile.x[1]);
+        const sy = Math.max(0, Math.min(h-2, y));
+        return dominantBandColor(ctx,x0,sy,Math.max(2,x1-x0),2,1,def);
+      }
+      function setupAmbient(){
+        const gc=document.getElementById('game-container');
+        if(!gc) return;
+        const canvas=gc.querySelector('canvas');
+        if(!canvas) return;
+        const off=document.createElement('canvas');
+        const octx=off.getContext('2d',{willReadFrequently:true});
+        let last={r:0,g:0,b:0};
+        let started=false; const startAt=performance.now()+1200; // wait ~1.2s for first render
+        var lastTop={r:0,g:0,b:0}, lastBot={r:0,g:0,b:0};
+        var targetTop={r:0,g:0,b:0}, targetBot={r:0,g:0,b:0};
+        var pendingImmediate = 0;
+        var lastSampleTs = 0;
+        function coarseInit(){
+          // one-time coarse init from center area to avoid green defaults
+          const cx=Math.floor(off.width*0.2), cy=Math.floor(off.height*0.2);
+          const cw=Math.max(2, Math.floor(off.width*0.6)), ch=Math.max(2, Math.floor(off.height*0.6));
+          const def = dominantBandColor(octx,cx,cy,cw,ch,4,{r:60,g:90,b:60}) || {r:60,g:90,b:60};
+          targetTop = def; targetBot = def; lastTop = def; lastBot = def;
+        }
+        function tick(){
+          const w=canvas.width, h=canvas.height; if(!w||!h) {requestAnimationFrame(tick); return;}
+          const scale= Math.max(1, Math.floor(Math.min(w,h)/64));
+          off.width=Math.max(4, Math.floor(w/scale));
+          off.height=Math.max(4, Math.floor(h/scale));
+          octx.globalCompositeOperation = 'copy';
+          octx.clearRect(0,0,off.width,off.height);
+          octx.drawImage(canvas,0,0,off.width,off.height);
+          const now = performance.now();
+          if(!started && now<startAt && pendingImmediate<=0){ requestAnimationFrame(tick); return; }
+          started=true;
+          if(lastSampleTs===0){ coarseInit(); }
+          // sample at most once per second or when forced
+          if(pendingImmediate>0 || now - lastSampleTs >= 500){
+            lastSampleTs = now;
+            const topY = findOpaqueRowTop(octx,off.width,off.height);
+            const botY = findOpaqueRowBottom(octx,off.width,off.height);
+            let top = stripeAtYColor(octx,off.width,off.height, topY, targetTop);
+            let bot = stripeAtYColor(octx,off.width,off.height, botY-1, targetBot);
+            const isDark = c=> (0.2126*c.r+0.7152*c.g+0.0722*c.b) < 8;
+            if(!isDark(top))  targetTop = top;
+            if(!isDark(bot))  targetBot = bot;
+            if(window.Ambient && window.Ambient.debug){
+              const hx = c=> '#' + [c.r,c.g,c.b].map(v=>{
+                const n=Math.max(0,Math.min(255,Math.round(v))); return n.toString(16).padStart(2,'0');
+              }).join('');
+              console.log('[Ambient] yTop',topY,'yBot',botY,'top',hx(top),'bot',hx(bot),'targets',hx(targetTop),hx(targetBot));
+            }
+          }
+          // smooth towards targets every frame
+          lastTop={r:lerp(lastTop.r,targetTop.r,0.12), g:lerp(lastTop.g,targetTop.g,0.12), b:lerp(lastTop.b,targetTop.b,0.12)};
+          lastBot={r:lerp(lastBot.r,targetBot.r,0.12), g:lerp(lastBot.g,targetBot.g,0.12), b:lerp(lastBot.b,targetBot.b,0.12)};
+          const colTop=toCss(lastTop), colBot=toCss(lastBot);
+          const split = activeProfile.split || 0.5; const a = Math.max(0, Math.min(100, Math.round(split*100)));
+          const grad = `linear-gradient(180deg, ${colTop} 0%, ${colTop} ${a-2}%, ${colBot} ${a+2}%, ${colBot} 100%)`;
+          document.body.style.setProperty('background-image', grad, 'important');
+          document.body.style.removeProperty('background-color');
+          document.documentElement.style.setProperty('background-image', grad, 'important');
+          document.documentElement.style.removeProperty('background-color');
+          if(pendingImmediate>0) pendingImmediate--;
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+      if(document.readyState==='complete' || document.readyState==='interactive'){
+        setTimeout(setupAmbient,0);
+      } else {
+        document.addEventListener('DOMContentLoaded', setupAmbient);
+      }
+      const mo=new MutationObserver(()=>setupAmbient());
+      mo.observe(document.documentElement,{subtree:true,childList:true});
+    })();
+  </script>
+  <script>
+window.onerror = function(message, source, lineno, colno, error) {
+  document.body.innerHTML = '<pre style="color:red;background:#fff;z-index:9999;position:absolute;top:0;left:0;width:100vw;height:100vh;">JS ERROR:\n' + message + '\n' + (error && error.stack ? error.stack : '') + '</pre>';
+};
+window.addEventListener('unhandledrejection', function(e) {
+  document.body.innerHTML = '<pre style="color:red;background:#fff;z-index:9999;position:absolute;top:0;left:0;width:100vw;height:100vh;">PROMISE ERROR:\n' + e.reason + '</pre>';
+});
+</script>
+  <script type="module" crossorigin src="./assets/index-DrFUXjn3.js"></script>
+</head>
+<body>
+  <div id="game-container"></div>
+</body>
+</html>

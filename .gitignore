@@ -30,17 +30,17 @@ replay_*.log
 *.backup
 main.backup.js
 
-# Source files (we only need www/ for GitHub Pages)
+# Source files
 src/
-assets/
-loadingphoto/
 public/
-index.html
 dev-entry.js
 vite.config.js
 package.json
 package-lock.json
 capacitor.config.json
+
+# www/ klasörü (build output, root'taki dosyalar GitHub Pages için)
+www/
 
 # Documentation
 *.md
