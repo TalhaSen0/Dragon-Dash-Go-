@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+__node_modules_backup/
+
+# Build outputs (we'll commit www/ for GitHub Pages)
+# www/ is committed for GitHub Pages
+
+# Android
+android/app/build/
+android/.gradle/
+android/local.properties
+*.apk
+*.aab
+*.jks
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+replay_*.log
+
+# Backup files
+*.backup
+main.backup.js
+
+# Source files (we only need www/ for GitHub Pages)
+src/
+assets/
+loadingphoto/
+public/
+index.html
+dev-entry.js
+vite.config.js
+package.json
+package-lock.json
+capacitor.config.json
+
+# Documentation
+*.md
+!README.md
+
+# Store descriptions
+store-descriptions/
+
+# Scripts
+*.ps1
+*.sh
+
+# Other
+project.config
+thumbnail.png
+

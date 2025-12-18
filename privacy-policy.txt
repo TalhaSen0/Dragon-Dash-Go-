@@ -1,0 +1,88 @@
+GİZLİLİK POLİTİKASI – ShantGame
+
+ShantGame olarak gizliliğinizi ciddiye alıyoruz. Bu gizlilik politikası, Android platformunda yayınladığımız mobil oyunlarımızda kullanıcı verilerini nasıl işlediğimizi açıklamaktadır.
+
+1. TOPLANAN VERİLER
+
+1.1. Kişisel Bilgiler
+Oyunlarımızda doğrudan kişisel bilgi (ad, soyad, e-posta adresi, telefon numarası vb.) toplamıyoruz.
+
+1.2. Otomatik Toplanan Veriler
+Oyunlarımız, aşağıdaki amaçlarla üçüncü taraf SDK'ları kullanarak otomatik olarak belirli veriler toplayabilir:
+
+- Reklam Hizmetleri: Google AdMob reklam gösterimi için cihaz bilgileri ve IP adresi toplayabilir. Çocuklara yönelik uygulamalar için uyumlu olması amacıyla reklam kimliği (AAID) toplamıyoruz ve kişiselleştirilmiş reklamlar göstermiyoruz.
+- Oyun İçi Veriler: Skor bilgileri, oyun içi ilerleme ve liderlik tablosu verileri toplanıp sunucularımızda saklanabilir.
+
+2. VERİLERİN KULLANIMI
+
+Toplanan veriler aşağıdaki amaçlarla kullanılmaktadır:
+
+- Oyunun performansını izlemek ve iyileştirmek
+- Hataları tespit etmek ve düzeltmek
+- Skor tablosunu ve liderlik sıralamasını güncellemek
+- Genel reklamları göstermek (kişiselleştirilmiş reklamlar göstermiyoruz)
+- Oyun deneyimini geliştirmek
+
+Önemli: Toplanan veriler tarafımızca üçüncü şahıslara satılmaz, paylaşılmaz veya kiralanmaz.
+
+3. VERİ GÜVENLİĞİ
+
+Verilerinizin güvenliğini sağlamak için endüstri standardı güvenlik önlemleri kullanıyoruz. Ancak, internet üzerinden veri aktarımının %100 güvenli olması mümkün olmadığını ve hiçbir güvenlik sistemi tamamen kusursuz olmadığını unutmayın.
+
+4. VERİ SAKLAMA SÜRESİ
+
+Toplanan veriler, yukarıda belirtilen amaçlar için gerekli olduğu sürece saklanır. Oyun içi skor verileri, liderlik tablosu güncellemeleri için saklanabilir. Analitik ve reklam verileri, ilgili servis sağlayıcıların kendi politikalarına göre saklanır.
+
+5. ÜÇÜNCÜ TARAF SERVİSLERİ
+
+Oyunlarımız aşağıdaki üçüncü taraf servisleri kullanmaktadır:
+
+5.1. Reklam Hizmetleri
+- Google AdMob: https://policies.google.com/privacy
+
+Bu servislerin kendi gizlilik politikaları geçerlidir. Lütfen ilgili politikaları inceleyin.
+
+6. KULLANICI HAKLARI
+
+KVKK (Kişisel Verilerin Korunması Kanunu) ve GDPR (Genel Veri Koruma Tüzüğü) kapsamında aşağıdaki haklara sahipsiniz:
+
+- Bilgi Alma Hakkı: Kişisel verilerinizin işlenip işlenmediğini öğrenme
+- Erişim Hakkı: İşlenen kişisel verilerinize erişim talep etme
+- Düzeltme Hakkı: Yanlış veya eksik verilerin düzeltilmesini isteme
+- Silme Hakkı: Verilerinizin silinmesini talep etme
+- İtiraz Hakkı: Veri işlemeye itiraz etme
+- Veri Taşınabilirliği: Verilerinizi başka bir servise aktarma hakkı
+
+Bu haklarınızı kullanmak için bizimle iletişime geçebilirsiniz.
+
+7. ÇOCUKLARIN GİZLİLİĞİ
+
+Oyunlarımız çocuklara yönelik olarak tasarlanmıştır ve çocukların gizliliğini korumak için özel önlemler almaktayız. COPPA (Children's Online Privacy Protection Act) ve Google Play politikalarına uygun olarak:
+
+- Reklam kimliği (AAID) toplamıyoruz
+- Kişiselleştirilmiş reklamlar göstermiyoruz
+- 13 yaş altındaki kullanıcıların kişisel bilgilerini bilinçli olarak toplamıyoruz
+- Reklam gösterimleri için sadece gerekli minimum verileri kullanıyoruz
+
+Eğer bir ebeveyn veya vasisiniz ve çocuğunuzun bizimle paylaştığı kişisel bilgiler hakkında endişeleriniz varsa, lütfen bizimle iletişime geçin.
+
+8. ÇEREZLER VE BENZERİ TEKNOLOJİLER
+
+Oyunlarımız, reklam ve analitik amaçlı çerezler ve benzeri teknolojiler kullanabilir. Bu teknolojiler, deneyiminizi iyileştirmek ve reklamları optimize etmek için kullanılır.
+
+9. VERİ AKTARIMI
+
+Toplanan veriler, yukarıda belirtilen üçüncü taraf servis sağlayıcıların sunucularına aktarılabilir. Bu aktarımlar, ilgili servis sağlayıcıların gizlilik politikalarına tabidir.
+
+10. POLİTİKA DEĞİŞİKLİKLERİ
+
+Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişikliklerde, uygulama içi bildirim veya web sitemiz aracılığıyla sizi bilgilendireceğiz. Politikanın güncel halini bu sayfadan takip edebilirsiniz.
+
+11. İLETİŞİM
+Gizlilik politikası veya veri işleme uygulamalarımız hakkında sorularınız için bizimle iletişime geçebilirsiniz:
+
+E-posta: contact.shantgame@gmail.com
+
+Son güncelleme: 04 Kasım 2025
+
+
